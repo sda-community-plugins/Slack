@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.urbancode.com/PluginXMLSchema_v1">
+    <header>
+        <identifier version="1" id="com.serena.air.plugin.Slack" name="Slack"/>
+        <description>
+            The Slack plugin allows you to send notifications to a Slack channel as part of a workflow.
+        </description>
+        <tag>Automation/Slack</tag>
+    </header>
+
+    <!-- ==================================== -->
+    <!--  Post a Notification                 -->
+    <!-- ==================================== -->
+    <step-type name="Post Notification to Slack">
+        <description>
+            Send a notification to a Slack channel.
+        </description>
+        <properties>
+            <property name="webhook" required="true">
+                <property-ui description="The Incoming WebHook URL that will accept external messages into Slack."
+                             label="WebHook URL" type="textBox"/>
+            </property>
+            <property name="username">
+                <property-ui default-value="Deployment Automation"
+                             description="A custom name overriding the default defined in the webhook configuration"
+                             label="Username" type="textBox"/>
+            </property>
+            <property name="channel" required="true">
+                <property-ui
+                        description="Your public channel within Slack where Deployment Automation messages will be sent.
+                        The WebHook must have access to this channel."
+                        label="Channel" type="textBox"/>
+            </property>
+            <property name="colour">
+                <property-ui default-value="good"
+                             description="An optional value that can either be one of good, warning, danger, or any
+                             hex color code (eg. #439FE0)."
+                             label="Colour" type="textBox"/>
+            </property>
+            <property name="emoji" required="true">
+                <property-ui default-value=":thumbsup:"
+                             description="The list of emoji supported are taken from https://github.com/iamcal/emoji-data ."
+                             label="Emoji Icon" type="textBox"/>
+            </property>
+            <property name="environment" required="true">
+                <property-ui default-value="${p:environment.name}"
+                             description="The environment where the application has been deployed." hidden="true"
+                             label="Environment Name" type="textBox"/>
+            </property>
+            <property name="application" required="true">
+                <property-ui default-value="${p:application.name}" description="The name of the application deployed."
+                             hidden="true" label="Application Name" type="textBox"/>
+            </property>
+            <property name="component" required="true">
+                <property-ui default-value="${p:component.name}" description="The name of the component deployed."
+                             hidden="true" label="Component Name" type="textBox"/>
+            </property>
+            <property name="version" required="true">
+                <property-ui default-value="${p:version.name}" description="The version of the component deployed."
+                             hidden="true" label="Version Name" type="textBox"/>
+            </property>
+            <property name="requestUrl" required="true">
+                <property-ui default-value="${p:server.url}/app#/component-process-request/${p:request.id }/log"
+                             description="The URL of the deployment request."
+                             hidden="true" label="Request URL" type="textBox"/>
+            </property>
+            <property name="debugMode" required="false">
+                <property-ui type="checkBox" label="Debug Output" hidden="true"
+                             description="Select this option to display debug output during execution."/>
+            </property>
+        </properties>
+        <post-processing><![CDATA[
+        if (properties.get("exitCode") != 0) {
+            properties.put(new java.lang.String("Status"), new java.lang.String("Failure"));
+        }
+        else {
+            properties.put("Status", "Success");
+        }
+     ]]></post-processing>
+        <command program="${GROOVY_HOME}/bin/groovy">
+            <arg value="-cp"/>
+            <arg path="classes:lib/*"/>
+            <arg file="post_slack.groovy"/>
+            <arg file="${PLUGIN_INPUT_PROPS}"/>
+            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+        </command>
+    </step-type>
+
+    <!-- ======================================= -->
+    <!--  Post Attachment Notification to Slack  -->
+    <!-- ======================================= -->
+    <step-type name="Post Attachment Notification to Slack">
+        <description>
+            Send an attachment notification to a Slack channel.
+        </description>
+        <properties>
+            <property name="webhook" required="true">
+                <property-ui description="The Incoming WebHook URL that will accept external messages into Slack."
+                             label="WebHook URL" type="textBox"/>
+            </property>
+            <property name="username">
+                <property-ui default-value="Deployment Automation"
+                             description="A custom name overriding the default defined in the webhook configuration"
+                             label="Username" type="textBox"/>
+            </property>
+            <property name="channels" required="true">
+                <property-ui
+                        description="Your public channels or usernames within Slack where Deployment Automation
+                         messages will be sent. The WebHook must have access to this channels.
+                         Separate each channel or username with a new line or comma."
+                        label="Channels" type="textAreaBox"/>
+            </property>
+            <property name="emoji" required="true">
+                <property-ui default-value=":thumbsup:"
+                             description="The list of emoji supported are taken from https://github.com/iamcal/emoji-data ."
+                             label="Emoji Icon" type="textBox"/>
+            </property>
+            <property name="attachment" required="true">
+                <property-ui description="The Attachment JSON Payload to generate the Slack message."
+                             label="Attachment Payload" type="textAreaBox"/>
+            </property>
+            <property name="debugMode" required="false">
+                <property-ui type="checkBox" label="Debug Output" hidden="true"
+                             description="Select this option to display debug output during execution."/>
+            </property>
+        </properties>
+        <post-processing>
+            <![CDATA[
+                if (properties.get("exitCode") != 0) {
+                    properties.put(new java.lang.String("Status"), new java.lang.String("Failure"));
+                }
+                else {
+                    properties.put("Status", "Success");
+                }
+            ]]>
+        </post-processing>
+        <command program="${GROOVY_HOME}/bin/groovy">
+            <arg value="-cp"/>
+            <arg path="classes:lib/*"/>
+            <arg file="post_slack_attachment.groovy"/>
+            <arg file="${PLUGIN_INPUT_PROPS}"/>
+            <arg file="${PLUGIN_OUTPUT_PROPS}"/>
+        </command>
+    </step-type>
+
+</plugin>
