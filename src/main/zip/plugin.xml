@@ -91,7 +91,7 @@
     <!-- ======================================= -->
     <step-type name="Post Attachment Notification to Slack">
         <description>
-            Send an attachment notification to a Slack channel.
+            Send an attachment notification to one or more Slack channels.
         </description>
         <properties>
             <property name="webhook" required="true">
