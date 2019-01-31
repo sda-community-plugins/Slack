@@ -1,11 +1,11 @@
 # Micro Focus Deployment Automation - Slack plugin
 
-The Micro Focus Deployment Automation _Slack_ plugin allows you to send notifications as part of a Deployment Automation workflow.
+The _Slack_ plugin allows you to send notifications to Slack as part of a Deployment Automation workflow.
 
 This plugin is a work in progress but it is intended to provide the following steps:
 
 * [x] **Post a Notification** - Send a notification to a Slack channel
-* [x] **Post Attachment Notification to Slack** - Send an attachment notification to a Slack channel
+* [x] **Post Attachment Notification to Slack** - Send an attachment notification to one or more Slack channels
 
 ### Installing the plugin
  
